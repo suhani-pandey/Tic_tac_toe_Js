@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f0f0f0;
+}
+
+h1 {
+    color: #333;
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    gap: 15px;
+    margin: 20px auto;
+    width: 320px;
+}
+
+.cell {
+    width: 100px;
+    height: 100px;
+    background-color: #fff;
+    border: 2px solid #333;
+    font-size: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out; 
+}
+
+.cell:hover {
+    background-color: #ddd;
+}
+
+.message {
+    font-size: 24px;
+    margin: 10px 0px 10px 10px;
+}
+
+#reset-button {
+    font-size: 18px;
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    margin-top: 50px; /* Add some space between the board and the button */
+}
+
+#reset-button:hover {
+    background-color: #555;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="message" id="message">Player X's turn</div>
+    <button id="reset-button" onclick="reset_game()">Reset</button>
+    <script>
+        let currentPlayer = "X";
+let gameOver = false;
+
+
+
+const board = [null, null, null, null, null, null, null, null, null];
+
+
+function render_board() {
+    const boardElement = document.createElement("div");
+    boardElement.id = "board";
+    boardElement.className = "game-board";
+
+    board.forEach((square, index) => {
+        const squareElement = document.createElement("button");
+        squareElement.className = "cell";
+        squareElement.id = index.toString();
+        squareElement.addEventListener("click", () => switch_move(index));
+        boardElement.appendChild(squareElement);
+    });
+
+    document.body.appendChild(boardElement);
+}
+
+render_board();
+
+//pure function
+function change_player(currentPlayer) {
+    return currentPlayer === "X" ? "O" : "X";
+}
+
+
+function switch_move(index) {
+    const cell = document.getElementById(index.toString());
+    if (board[index] === null && !gameOver) {
+        cell.textContent = currentPlayer;
+        board[index] = currentPlayer;
+
+        if (check_winning_positions(currentPlayer)) {
+            gameOver = true;
+            const messageElement = document.getElementById("message");
+            messageElement.textContent = `Player ${currentPlayer} wins!`;
+            
+
+        } else if (board.every((square) => square !== null)) {
+            gameOver = true;
+            const messageElement = document.getElementById("message");
+            messageElement.textContent = "It's a draw!";
+
+        } else {
+            currentPlayer= change_player(currentPlayer);
+        }
+    }
+}
+
+//pure function
+function check_winning_positions() {
+    const positions = [
+        [0, 1, 2], [0, 3, 6], [6, 7, 8], [2, 5, 7],
+        [0, 4, 8], [2, 4, 6], [3, 4, 5], [1, 4, 7]
+    ];
+
+    for (const combination of positions) {
+        const [a, b, c] = combination;
+
+        if (board[a] === currentPlayer && board[b] === currentPlayer && board[c] === currentPlayer) {
+            return true; 
+        }
+    }
+    return false; 
+}
+
+//pure function
+function reset_game() {
+    board.forEach((square, index) => {
+        board[index] = null;
+        document.getElementById(index.toString()).textContent = "";
+        document.getElementById(index.toString()).classList.remove('winning-cell');
+    });
+    gameOver = false;
+    currentPlayer = "X";
+    const messageElement = document.getElementById("message");
+    messageElement.textContent = `Player ${currentPlayer}'s turn`;
+    
+
+}
+    </script>
+</body>
+</html>
+

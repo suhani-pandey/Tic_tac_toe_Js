@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f0f0f0;
+}
+
+h1 {
+    color: #333;
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    gap: 15px;
+    margin: 20px auto;
+    width: 320px;
+}
+
+.cell {
+    width: 100px;
+    height: 100px;
+    background-color: #fff;
+    border: 2px solid #333;
+    font-size: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out; 
+}
+
+.cell:hover {
+    background-color: #ddd;
+}
+
+/* Add styles for "X" and "O" */
+.cell.X {
+    background-color: #000;
+    color: #fff;
+}
+
+.cell.O {
+    background-color: #fff;
+    color: #000;
+}
+
+
+.message {
+    font-size: 24px;
+    margin: 10px 0px 10px 10px;
+}
+
+#reset-button {
+    font-size: 18px;
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    margin-top: 50px; /* Add some space between the board and the button */
+}
+
+#reset-button:hover {
+    background-color: #555;
+}
+
+
+
+    </style>
+</head>
+<body>
+    
+    <div class="message" id="message">Player X's turn</div>
+    <button id="reset-button" onclick="reset_game()">Reset</button>
+    <script>
+        class Render_Board {
+    #boardElement;
+    #board;
+    #currentPlayer;
+    #gameOver;
+
+    constructor() {
+        this.#boardElement = document.createElement("div");
+        this.#boardElement.id = "board";
+        this.#boardElement.className = "game-board";
+        this.#board = [null, null, null, null, null, null, null, null, null];
+        this.#currentPlayer = "X"; 
+        this.#gameOver = false; 
+        this.render_Board();
+    }
+
+    get_board() {
+        return this.#board;
+    }
+
+    get_boardElement() {
+        return this.#boardElement;
+    }
+
+    get_currentPlayer() {
+        return this.#currentPlayer;
+    }
+
+    get_gameOver() {
+        return this.#gameOver;
+    }
+
+    render_Board() {
+        this.#boardElement.innerHTML = ""; 
+        this.#board.forEach((square, index) => {
+            const squareElement = document.createElement("button");
+            squareElement.className = "cell";
+            squareElement.id = index.toString();
+            squareElement.textContent = square ? square : ""; 
+
+            squareElement.addEventListener("click", () => {
+                this.switch_move(index);
+            });
+
+            this.#boardElement.appendChild(squareElement);
+        });
+
+        document.body.appendChild(this.#boardElement);
+        this.updateMessage();
+    }
+
+    switch_move(index) {
+        if (!this.#board[index] && !this.#gameOver) {
+            this.#board[index] = this.#currentPlayer;
+            this.render_Board();
+
+            if (this.check_Winning_Positions(this.#currentPlayer)) {
+                this.#gameOver = true;
+                this.updateMessage(`Player ${this.#currentPlayer} wins!`);
+            } else if (this.#board.every((square) => square !== null)) {
+                this.#gameOver = true;
+                this.updateMessage("It's a draw!");
+            } else {
+                this.#currentPlayer = this.#currentPlayer === "X" ? "O" : "X";
+            }
+        }
+    }
+
+    check_Winning_Positions(currentPlayer) {
+        const winningCombos = [
+            [0, 1, 2], [0, 3, 6], [6, 7, 8], [2, 5, 7],
+            [0, 4, 8], [2, 4, 6], [3, 4, 5], [1, 4, 7]
+        ];
+    
+        return winningCombos.some(combo =>
+            combo.every(index => this.#board[index] === currentPlayer)
+        );
+    }
+
+    updateMessage(message) {
+        const messageElement = document.getElementById("message");
+        messageElement.textContent = message || `Player ${this.#currentPlayer}'s turn`;
+    }
+
+    reset_Game() {
+        this.#board = [null, null, null, null, null, null, null, null, null];
+        this.#currentPlayer = "X";
+        this.#gameOver = false; // Reset game over state
+        this.render_Board(); // Re-render the board
+        this.updateMessage(`Player ${this.#currentPlayer}'s turn`); // Update the message
+    }
+    
+}
+
+const gameBoard = new Render_Board();
+
+class Reset_Game {
+    constructor() {
+        const resetButton = document.getElementById('reset-button');
+        resetButton.addEventListener('click', () => {
+            gameBoard.reset_Game();
+        });
+    }
+}
+
+const resetHandler = new Reset_Game();
+
+    </script>
+    
+</body>
+</html>
+
